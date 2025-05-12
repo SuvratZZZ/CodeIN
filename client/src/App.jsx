@@ -7,8 +7,8 @@ import SignupPage from './pages/SignupPage';
 function App() {
   const [count, setCount] = useState(0)
 
-  let authUser=true;
-  // let authUser=false;
+  // let authUser=true;
+  let authUser=false;
   return (
    <div className='flex flex-col items-center'>
     <Routes>
