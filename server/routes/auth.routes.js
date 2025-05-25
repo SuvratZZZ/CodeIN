@@ -1,10 +1,13 @@
 import {Router} from 'express';
-import { check, login, logout, register } from '../controllers/auth.controllers';
-import { authMid } from '../middleware/auth.middleware';
+import { check, login, logout, register, googleLogin } from '../controllers/auth.controllers.js';
+import { authMid } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
 router.post("/login",login);
 router.post("/logout",authMid,logout);
 router.post("/register",register);
-router.post("/check",authMid,check);
+router.get("/check",authMid,check);
+router.post("/google",googleLogin);
+
+export default router;

@@ -2,6 +2,7 @@ import React , {useState} from 'react'
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import { Link } from 'react-router-dom'
+import GoogleLogin from '../components/GoogleLogin'
 import {
   Code,
   Eye,
@@ -33,7 +34,7 @@ const SignUpPage = () => {
     formState:{errors},
   } = useForm({
     resolver:zodResolver(SignUpSchema)
-  })
+  }) 
 
   const onSubmit = async (data)=>{
    try {
@@ -159,6 +160,7 @@ const SignUpPage = () => {
               )}
             </button>
           </form>
+          <GoogleLogin/>
 
           {/* Footer */}
           <div className="text-center">

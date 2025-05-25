@@ -1,6 +1,12 @@
 import { db } from "../libs/db.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(
+    process.env.G_CL_ID,
+    process.env.G_CL_SC
+);
 
 export const register = async (req,res)=>{
     const {email,password,name} = req.body;
@@ -12,22 +18,37 @@ export const register = async (req,res)=>{
             }
         })
 
-        if(existing){
+        let newUser;
+
+        if(existing?.password === "GOOGLE_LOGIN"){
+            const hashedPass = await bcrypt.hash(password,10);
+            newUser = await db.User.update({
+                where:{
+                    email
+                },
+                data:{
+                    password:hashedPass,
+                }
+            });
+        }
+        else if(existing){
             return res.status(400).json({
                 success : false,
                 error : "user alredy exist"
             })
         }
+        else{
+            const hashedPass = await bcrypt.hash(password,10);
+    
+            newUser = await db.User.create({
+                data:{
+                    email,
+                    password:hashedPass,
+                    name
+                }
+            })
+        }
 
-        const hashedPass = await bcrypt.hash(password,10);
-
-        const newUser = await db.User.create({
-            data:{
-                email,
-                password:hashedPass,
-                name
-            }
-        })
 
         const token = jwt.sign({id:newUser.id}, process.env.JWT_S,{
             expiresIn : "7d"
@@ -61,33 +82,40 @@ export const register = async (req,res)=>{
     }
 }
 
-export const login = async (req,res)=>{
-    const {email,password} = req.body;
+export const googleLogin = async (req,res)=>{
+    const {credential} = req.body;
+    // console.log(credential);
 
     try{
-        const existing = await db.User.findUnique({
+        const userProfile = await googleClient.verifyIdToken({
+            idToken:credential,
+            audience:process.env.G_CL_ID
+        });
+        // console.log(userProfile);
+
+        const payload = userProfile.getPayload();
+        // console.log(payload);
+
+        let existing = await db.User.findUnique({
             where:{
-                email
+                email:payload.email
             }
-        })
+        });
 
-        if(existing){
-            return res.status(401).json({
-                success : false,
-                error : "user not found"
-            })
-        }
-        
-        const isMatch = await bcrypt.compare(password,existing.password);
-        
-        if(isMatch){
-            return res.status(401).json({
-                success : false,
-                error : "wrong cred"
-            })
+        if(!existing){
+            existing = await db.User.create({
+                data:{
+                    email:payload.email,
+                    name:payload.name,
+                    image:payload.picture,
+                    password:"GOOGLE_LOGIN",
+                }
+            });
         }
 
-        const token = jwt.sign({id:newUser.id}, process.env.JWT_S,{
+        console.log("existing",existing);
+
+        const token = jwt.sign({id:existing.id}, process.env.JWT_S,{
             expiresIn : "7d"
         });
 
@@ -108,7 +136,65 @@ export const login = async (req,res)=>{
                 role:existing.role,
                 image:existing.image
             }
+        });  
+    }
+    catch(e){
+        console.error("error google login",e);
+        res.status(500).json({
+            success:false,
+            message:"error google login"
         })
+    }
+}
+
+export const login = async (req,res)=>{
+    const {email,password} = req.body;
+
+    try{
+        const existing = await db.User.findUnique({
+            where:{
+                email
+            }
+        })
+
+        if(!existing){
+            return res.status(401).json({
+                success : false,
+                error : "user not found"
+            })
+        }
+        
+        const isMatch = await bcrypt.compare(password,existing.password);
+        
+        if(!isMatch){
+            return res.status(401).json({
+                success : false,
+                error : "wrong cred"
+            })
+        }
+
+        const token = jwt.sign({id:existing.id}, process.env.JWT_S,{
+            expiresIn : "7d"
+        });
+
+        res.cookie("jwt",token,{
+            httpOnly:true,
+            sameSite:"strict",
+            secure:process.env.NODE_E !== "development",
+            maxAge:7*24*60*60*1000
+        });
+
+        res.status(201).json({
+            success:true,
+            message:"User logedin",
+            user:{
+                id:existing.id,
+                email:existing.email,
+                name:existing.name,
+                role:existing.role,
+                image:existing.image
+            }
+        });
     }
     catch(e){
         console.error("error login",e);
@@ -157,3 +243,4 @@ export const check = async (req,res)=>{
         })
     }
 }
+
