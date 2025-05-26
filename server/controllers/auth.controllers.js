@@ -113,7 +113,7 @@ export const googleLogin = async (req,res)=>{
             });
         }
 
-        console.log("existing",existing);
+        // console.log("existing",existing);
 
         const token = jwt.sign({id:existing.id}, process.env.JWT_S,{
             expiresIn : "7d"

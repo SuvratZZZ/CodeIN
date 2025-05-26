@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 export const useSubmissionStore = create((set, get) => ({
   isLoading: false,
   submissions: [],
-  submission: null,
-  submissionCount: null,
+  submission: 0,
+  submissionCount: 0,
 
   getAllSubmissions: async () => {
     try {

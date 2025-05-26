@@ -85,9 +85,20 @@ export const getProblemById = async (req, res) => {
 };
 
 export const getAllProblems = async (req, res) => {
-    const problems = await db.Problem.findMany();
-
-    res.status(200).json(problems);
+    try {   
+        const problems = await db.Problem.findMany();
+        res.status(200).json({
+            success: true,
+            message: "Problems fetched successfully",
+            problems
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch problems",
+            details: error.message
+        });
+    }
 };
 
 export const updateProblem = async (req, res) => {

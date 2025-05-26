@@ -18,7 +18,11 @@ export const getAllSubmission = async(req , res)=>{
         
     } catch (error) {
         console.error("Fetch Submissions Error:", error);
-        res.status(500).json({ error: "Failed to fetch submissions" });
+        res.status(500).json({
+            error: "Failed to fetch submissions",
+            success: false,
+            message: error.message
+        });
     }
 }
 
@@ -41,7 +45,11 @@ export const getSubmissionsForProblem = async (req , res)=>{
         })
     } catch (error) {
         console.error("Fetch Submissions Error:", error);
-        res.status(500).json({ error: "Failed to fetch submissions" });
+        res.status(500).json({ 
+            error: "Failed to fetch submissions", 
+            success: false,
+            message: error.message
+        });
     }
 }
 
@@ -49,12 +57,12 @@ export const getSubmissionsForProblem = async (req , res)=>{
 export const getAllTheSubmissionsForProblem = async (req , res)=>{
     try {
         const problemId = req.params.problemId;
-        const submission = await db.submission.count({
+        const submission = await db.submission?.count({
             where:{
                 problemId:problemId
             }
-        })
-
+        }) || 0 ;
+        // console.log("submission",submission);
         res.status(200).json({
             success:true,
             message:"Submissions Fetched successfully",
@@ -62,6 +70,10 @@ export const getAllTheSubmissionsForProblem = async (req , res)=>{
         })
     } catch (error) {
         console.error("Fetch Submissions Error:", error);
-        res.status(500).json({ error: "Failed to fetch submissions" });
+        res.status(500).json({
+            error: "Failed to fetch submissions",
+            success: false,
+            error: error.message
+        });
     }
 }
