@@ -14,17 +14,32 @@ export const getJudge0LanguageId = (language)=>{
 
 const sleep  = (ms)=> new Promise((resolve)=> setTimeout(resolve , ms))
 
+// Helper function to encode strings to base64
+const encodeBase64 = (str) => {
+    return Buffer.from(str).toString('base64')
+}
+
+// Helper function to decode base64 to string
+const decodeBase64 = (str) => {
+    return Buffer.from(str, 'base64').toString('utf-8')
+}
+
 export const pollBatchResults = async (tokens)=>{
     while(true){
         
         const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
             params:{
                 tokens:tokens.join(","),
-                base64_encoded:false,
+                base64_encoded:true,
             }
         })
 
-        const results = data.submissions;
+        const results = data.submissions.map(submission => ({
+            ...submission,
+            stdout: submission.stdout ? decodeBase64(submission.stdout) : null,
+            stderr: submission.stderr ? decodeBase64(submission.stderr) : null,
+            compile_output: submission.compile_output ? decodeBase64(submission.compile_output) : null,
+        }))
 
         const isAllDone = results.every(
             (r)=> r.status.id !== 1 && r.status.id !== 2
@@ -36,8 +51,15 @@ export const pollBatchResults = async (tokens)=>{
 }
 
 export const submitBatch = async (submissions)=>{
-    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,{
-        submissions
+    // Encode the submissions
+    const encodedSubmissions = submissions.map(submission => ({
+        ...submission,
+        source_code: encodeBase64(submission.source_code),
+        stdin: submission.stdin ? encodeBase64(submission.stdin) : null,
+    }))
+
+    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=true`,{
+        submissions: encodedSubmissions
     })
 
 

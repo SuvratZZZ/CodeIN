@@ -6,7 +6,7 @@ import {
   Calendar,
 } from "lucide-react";
 
-const SubmissionsList = ({ submissions, isLoading }) => {
+const SubmissionsList = ({ submissions, isLoading, onOpenSubmission }) => {
   // Helper function to safely parse JSON strings
   const safeParse = (data) => {
     try {
@@ -19,9 +19,12 @@ const SubmissionsList = ({ submissions, isLoading }) => {
 
   // Helper function to calculate average memory usage
   const calculateAverageMemory = (memoryData) => {
-    const memoryArray = safeParse(memoryData).map((m) =>
-      parseFloat(m.split(" ")[0])
-    );
+    if (!memoryData) return 0;
+    const memoryArray = safeParse(memoryData).map((m) =>{
+      const memory = parseFloat(m.split(" ")[0]);
+      if (isNaN(memory)) return 0;
+      return memory;
+    });
     if (memoryArray.length === 0) return 0;
     return (
       memoryArray.reduce((acc, curr) => acc + curr, 0) / memoryArray.length
@@ -30,9 +33,12 @@ const SubmissionsList = ({ submissions, isLoading }) => {
 
   // Helper function to calculate average runtime
   const calculateAverageTime = (timeData) => {
-    const timeArray = safeParse(timeData).map((t) =>
-      parseFloat(t.split(" ")[0])
-    );
+    if (!timeData) return 0;
+    const timeArray = safeParse(timeData).map((t) =>{
+      const time = parseFloat(t.split(" ")[0]);
+      if (isNaN(time)) return 0;
+      return time;
+    });
     if (timeArray.length === 0) return 0;
     return timeArray.reduce((acc, curr) => acc + curr, 0) / timeArray.length;
   };
@@ -64,7 +70,8 @@ const SubmissionsList = ({ submissions, isLoading }) => {
         return (
           <div
             key={submission.id}
-            className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow rounded-lg"
+            className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow rounded-lg cursor-pointer"
+            onClick={() => onOpenSubmission(submission)}
           >
             <div className="card-body p-4">
               <div className="flex items-center justify-between">

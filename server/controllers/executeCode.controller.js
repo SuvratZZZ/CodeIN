@@ -53,13 +53,13 @@ export const executeCode = async (req, res) => {
       const passed = stdout === expected_output;
 
       if (!passed) allPassed = false;
-      // console.log("//////////a p ", passed);
+
       return {
         testCase: i + 1,
         passed,
         stdout,
         expected: expected_output,
-        stderr: result.stderr || null,
+        stderr: result.status.description !== "Accepted" ? result.compile_output : null,
         compile_output: result.compile_output || null,
         status: result.status.description,
         memory: result.memory ? `${result.memory} KB` : undefined,
@@ -77,7 +77,6 @@ export const executeCode = async (req, res) => {
     console.log(detailedResults);
 
     // store submission summary
-    console.log(" >>>>>>>>>>>>>>>>>> ", db.submission);
     // console.log(Object.keys(db));
     const submission = await db.submission.create({
       data: {
@@ -93,7 +92,7 @@ export const executeCode = async (req, res) => {
         compileOutput: detailedResults.some((r) => r.compile_output)
           ? JSON.stringify(detailedResults.map((r) => r.compile_output))
           : null,
-        status: allPassed ? "Accepted" : "Wrong Answer",
+        status: allPassed ? "Accepted" : detailedResults.some((r) => r.stderr) ? "Compilation Error" : "Wrong Answer",
         memory: detailedResults.some((r) => r.memory)
           ? JSON.stringify(detailedResults.map((r) => r.memory))
           : null,

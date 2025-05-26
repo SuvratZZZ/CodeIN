@@ -88,6 +88,11 @@ const ProblemPage = () => {
     }
   };
 
+  const handleOpenSubmission = (submission) => {
+    setSelectedLanguage(submission.language.toUpperCase());
+    setCode(submission.sourceCode);
+  };
+
   if (isProblemLoading || !problem) {
     return (
       <div className="flex items-center justify-center h-screen bg-base-200">
@@ -164,6 +169,7 @@ const ProblemPage = () => {
           <SubmissionsList
             submissions={submissions}
             isLoading={isSubmissionsLoading}
+            onOpenSubmission={handleOpenSubmission}
           />
         );
       case "discussion":
