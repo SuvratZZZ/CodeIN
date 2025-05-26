@@ -36,9 +36,9 @@ const ProblemPage = () => {
     submissionCount,
   } = useSubmissionStore();
   
+  const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT");
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
-  const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [testcases, setTestCases] = useState([]);
   
@@ -48,12 +48,11 @@ const ProblemPage = () => {
     getProblemById(id);
     getSubmissionCountForProblem(id);
   }, [id]);
-
+  
   useEffect(() => {
     if (problem) {
-      setCode(
-        problem.codeSnippets?.[selectedLanguage] || submission?.sourceCode || ""
-      );
+      setCode(problem.codeSnippets[selectedLanguage.toUpperCase()]);
+      console.log("problem", problem.codeSnippets[selectedLanguage.toUpperCase()]);
       setTestCases(
         problem.testcases?.map((tc) => ({
           input: tc.input,
@@ -308,13 +307,13 @@ const ProblemPage = () => {
               <div className="h-[600px] w-full">
                 <Editor
                   height="100%"
-                  language={selectedLanguage.toLowerCase()}
+                  language={selectedLanguage === "C++" ? "cpp" : selectedLanguage.toLowerCase()}
                   theme="vs-dark"
                   value={code}
                   onChange={(value) => setCode(value || "")}
                   options={{
                     minimap: { enabled: false },
-                    fontSize: 20,
+                    fontSize: 14,
                     lineNumbers: "on",
                     roundedSelection: false,
                     scrollBeyondLastLine: false,

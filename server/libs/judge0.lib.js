@@ -6,6 +6,7 @@ export const getJudge0LanguageId = (language)=>{
         "PYTHON":71,
         "JAVA":62,
         "JAVASCRIPT":63,
+        "C++":54,
     }
 
     return languageMap[language.toUpperCase()]
@@ -48,8 +49,8 @@ export const submitBatch = async (submissions)=>{
 
 export function getLanguageName(languageId){
     const LANGUAGE_NAMES = {
-        74: "TypeScript",
         63: "JavaScript",
+        54: "C++",
         71: "Python",
         62: "Java",
     }

@@ -50,16 +50,23 @@ const problemSchema = z.object({
       output: z.string().min(1, "Output is required"),
       explanation: z.string().optional(),
     }),
+    "C++": z.object({
+      input: z.string().min(1, "Input is required"),
+      output: z.string().min(1, "Output is required"),
+      explanation: z.string().optional(),
+    }),
   }),
   codeSnippets: z.object({
     JAVASCRIPT: z.string().min(1, "JavaScript code snippet is required"),
     PYTHON: z.string().min(1, "Python code snippet is required"),
     JAVA: z.string().min(1, "Java solution is required"),
+    "C++": z.string().min(1, "C++ solution is required"),
   }),
   referenceSolutions: z.object({
     JAVASCRIPT: z.string().min(1, "JavaScript solution is required"),
     PYTHON: z.string().min(1, "Python solution is required"),
     JAVA: z.string().min(1, "Java solution is required"),
+    "C++": z.string().min(1, "C++ solution is required"),
   }),
 });
 
@@ -108,6 +115,11 @@ const sampledpData = {
       output: "5",
       explanation:
         "There are five ways to climb to the top:\n1. 1 step + 1 step + 1 step + 1 step\n2. 1 step + 1 step + 2 steps\n3. 1 step + 2 steps + 1 step\n4. 2 steps + 1 step + 1 step\n5. 2 steps + 2 steps",
+    },
+    "C++": {
+      input: "n = 4",
+      output: "5",
+      explanation: "There are five ways to climb to the top:\n1. 1 step + 1 step + 1 step + 1 step\n2. 1 step + 1 step + 2 steps\n3. 1 step + 2 steps + 1 step\n4. 2 steps + 1 step + 1 step\n5. 2 steps + 2 steps",
     },
   },
   codeSnippets: {
@@ -171,6 +183,27 @@ class Main {
       System.out.println(result);
       scanner.close();
   }
+}`,
+    "C++": `#include <iostream>
+using namespace std;
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        // Write your code here
+        return 0;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+    
+    Solution solution;
+    int result = solution.climbStairs(n);
+    
+    cout << result << endl;
+    return 0;
 }`,
   },
   referenceSolutions: {
@@ -306,6 +339,39 @@ class Main {
       System.out.println(result);
       scanner.close();
   }
+}`,
+    "C++": `#include <iostream>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n <= 2) {
+            return n;
+        }
+        
+        vector<int> dp(n + 1);
+        dp[1] = 1;
+        dp[2] = 2;
+        
+        for (int i = 3; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        
+        return dp[n];
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+    
+    Solution solution;
+    int result = solution.climbStairs(n);
+    
+    cout << result << endl;
+    return 0;
 }`,
   },
 };
@@ -524,16 +590,39 @@ const CreateProblemForm = () => {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
         PYTHON: { input: "", output: "", explanation: "" },
         JAVA: { input: "", output: "", explanation: "" },
+        "C++": { input: "", output: "", explanation: "" },
       },
       codeSnippets: {
         JAVASCRIPT: "function solution() {\n  // Write your code here\n}",
         PYTHON: "def solution():\n    # Write your code here\n    pass",
         JAVA: "public class Solution {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}",
+        "C++": `#include <iostream>
+using namespace std;
+
+class Solution {
+public:
+    int climbStairs(int n) {
+        // Write your code here
+        return 0;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+    
+    Solution solution;
+    int result = solution.climbStairs(n);
+    
+    cout << result << endl;
+    return 0;
+}`,
       },
       referenceSolutions: {
         JAVASCRIPT: "// Add your reference solution here",
         PYTHON: "# Add your reference solution here",
         JAVA: "// Add your reference solution here",
+        "C++": "// Add your reference solution here",
       },
             }
         }
@@ -829,7 +918,7 @@ const CreateProblemForm = () => {
 
             {/* Code Editor Sections */}
             <div className="space-y-8">
-              {["JAVASCRIPT", "PYTHON", "JAVA"].map((language) => (
+              {["JAVASCRIPT", "PYTHON", "JAVA", "C++"].map((language) => (
                 <div
                   key={language}
                   className="card bg-base-200 p-4 md:p-6 shadow-md"
@@ -853,7 +942,7 @@ const CreateProblemForm = () => {
                             render={({ field }) => (
                               <Editor
                                 height="300px"
-                                language={language.toLowerCase()}
+                                language={language === "C++" ? "cpp" : language.toLowerCase()}
                                 theme="vs-dark"
                                 value={field.value}
                                 onChange={field.onChange}
@@ -893,7 +982,7 @@ const CreateProblemForm = () => {
                             render={({ field }) => (
                               <Editor
                                 height="300px"
-                                language={language.toLowerCase()}
+                                language={language === "C++" ? "cpp" : language.toLowerCase()}
                                 theme="vs-dark"
                                 value={field.value}
                                 onChange={field.onChange}

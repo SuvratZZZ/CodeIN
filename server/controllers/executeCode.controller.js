@@ -4,7 +4,6 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
-import { authMid } from "../middleware/auth.middleware.js";
 
 export const executeCode = async (req, res) => {
   try {
@@ -21,7 +20,11 @@ export const executeCode = async (req, res) => {
       !Array.isArray(expected_outputs) ||
       expected_outputs.length !== stdin.length
     ) {
-      return res.status(400).json({ error: "Invalid or Missing test cases" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or Missing test cases",
+        error: error.message,
+      });
     }
 
     // 2. Prepare each test cases for judge0 batch submission
@@ -50,7 +53,7 @@ export const executeCode = async (req, res) => {
       const passed = stdout === expected_output;
 
       if (!passed) allPassed = false;
-
+      // console.log("//////////a p ", passed);
       return {
         testCase: i + 1,
         passed,
@@ -74,6 +77,8 @@ export const executeCode = async (req, res) => {
     console.log(detailedResults);
 
     // store submission summary
+    console.log(" >>>>>>>>>>>>>>>>>> ", db.submission);
+    // console.log(Object.keys(db));
     const submission = await db.submission.create({
       data: {
         userId,
@@ -96,8 +101,12 @@ export const executeCode = async (req, res) => {
           ? JSON.stringify(detailedResults.map((r) => r.time))
           : null,
       },
+    }).catch(error => {
+      console.error('Failed to create submission:', error);
+      throw error;
     });
 
+    console.log("submission are ->> ", submission);
     // If All passed = true mark problem as solved for the current user
     if (allPassed) {
       await db.problemSolved.upsert({
@@ -120,19 +129,20 @@ export const executeCode = async (req, res) => {
       submissionId: submission.id,
       testCase: result.testCase,
       passed: result.passed,
-      stdout: result.stdout,
-      expected: result.expected,
-      stderr: result.stderr,
-      compileOutput: result.compile_output,
-      status: result.status,
-      memory: result.memory,
-      time: result.time,
+      stdout: result.stdout || null ,
+      expected: result.expected || null,
+      stderr: result.stderr || null,
+      compileOutput: result.compile_output || null,
+      status: result.status || null,
+      memory: result.memory || null,
+      time: result.time || null,
     }));
 
     await db.testCaseResult.createMany({
       data: testCaseResults,
     });
 
+    
     const submissionWithTestCase = await db.submission.findUnique({
       where: {
         id: submission.id,
@@ -148,7 +158,12 @@ export const executeCode = async (req, res) => {
       submission: submissionWithTestCase,
     });
   } catch (error) {
-    console.error("Error executing code:", error.message);
-    res.status(500).json({ error: "Failed to execute code" });
+    console.error("Error executing code:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to execute code",
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
