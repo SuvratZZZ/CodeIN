@@ -419,6 +419,11 @@ const sampleStringProblem = {
       output: "true",
       explanation: '"amanaplanacanalpanama" is a palindrome.',
     },
+    "C++": {
+      input: 's = "A man, a plan, a canal: Panama"',
+      output: "true",
+      explanation: '"amanaplanacanalpanama" is a palindrome.',
+    },
   },
   codeSnippets: {
     JAVASCRIPT: `/**
@@ -483,6 +488,28 @@ public class Main {
     }
 }
 `,
+    "C++": `#include <iostream>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        // Write your code here
+        return false;
+    }
+};
+
+int main() {
+    string input;
+    cin >> input;
+
+    Solution solution;
+    bool result = solution.isPalindrome(input);
+    
+    cout << (result ? "true" : "false") << endl;
+    return 0;
+}`,
   },
   referenceSolutions: {
     JAVASCRIPT: `/**
@@ -574,9 +601,204 @@ public class Main {
     }
 }
 `,
+    "C++": `#include <iostream>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        // Write your code here
+        return false;
+    }
+};
+
+int main() {
+    string input;
+    cin >> input;
+
+    Solution solution;
+    bool result = solution.isPalindrome(input);
+    
+    cout << (result ? "true" : "false") << endl;
+    return 0;
+}`,   
   },
 };
 
+const problem = {
+  title: "Longest Increasing Subsequence",
+  category: "dp",
+  description: "Given an integer array nums, return the length of the longest strictly increasing subsequence.",
+  difficulty: "MEDIUM",
+  tags: ["Dynamic Programming", "Array", "Binary Search"],
+  constraints: "1 <= nums.length <= 2500\n-10⁴ <= nums[i] <= 10⁴",
+  hints: "For O(n²) solution: For each element, check all previous elements. For O(n log n): Maintain a list of smallest possible tail values for increasing subsequences.",
+  editorial: "The standard DP approach uses dp[i] to represent the length of LIS ending with nums[i]. We can optimize using binary search to track potential candidates in O(n log n) time.",
+  testcases: [
+    { input: "[10,9,2,5,3,7,101,18]", output: "4" },
+    { input: "[0,1,0,3,2,3]", output: "4" },
+    { input: "[7,7,7,7,7]", output: "1" }
+  ],
+  examples: {
+    JAVASCRIPT: {
+      input: "nums = [10,9,2,5,3,7,101,18]",
+      output: "4",
+      explanation: "The longest increasing subsequence is [2,3,7,101], which has length 4."
+    },
+    PYTHON: {
+      input: "nums = [0,1,0,3,2,3]",
+      output: "4",
+      explanation: "The longest increasing subsequence is [0,1,2,3], which has length 4."
+    },
+    JAVA: {
+      input: "nums = [7,7,7,7]",
+      output: "1",
+      explanation: "All elements are equal - longest subsequence has length 1."
+    },
+    "C++": {
+      input: "nums = [3,4,-1,5,8]",
+      output: "4",
+      explanation: "One possible LIS: [3,4,5,8]"
+    }
+  },
+  codeSnippets: {
+    JAVASCRIPT: `/**
+* @param {number[]} nums
+* @return {number}
+*/
+function lengthOfLIS(nums) {
+  // Write your code here
+}
+
+// Input parsing
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+rl.on('line', (line) => {
+  const nums = JSON.parse(line.trim());
+  const result = lengthOfLIS(nums);
+  console.log(result);
+  rl.close();
+});`,
+
+    PYTHON: `from typing import List
+
+class Solution:
+  def lengthOfLIS(self, nums: List[int]) -> int:
+      # Write your code here
+      pass
+
+if __name__ == "__main__":
+  import sys, json
+  nums = json.loads(sys.stdin.read())
+  print(Solution().lengthOfLIS(nums))`,
+
+    JAVA: `import java.util.*;
+
+class Main {
+  public int lengthOfLIS(int[] nums) {
+      // Write your code here
+      return 0;
+  }
+  
+  public static void main(String[] args) {
+      Scanner scanner = new Scanner(System.in);
+      String input = scanner.nextLine();
+      int[] nums = Arrays.stream(input.replaceAll("[\\\\[\\\\]]", "").split(","))
+                         .mapToInt(Integer::parseInt)
+                         .toArray();
+      System.out.println(new Main().lengthOfLIS(nums));
+      scanner.close();
+  }
+}`,
+
+    "C++": `#include <iostream>
+#include <vector>
+#include <sstream>
+using namespace std;
+
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        // Write your code here
+        return 0;
+    }
+};
+
+int main() {
+    string input;
+    getline(cin, input);
+    input = input.substr(1, input.length()-2);
+    stringstream ss(input);
+    vector<int> nums;
+    string token;
+    
+    while(getline(ss, token, ',')) {
+        nums.push_back(stoi(token));
+    }
+    
+    cout << Solution().lengthOfLIS(nums) << endl;
+    return 0;
+}`
+  },
+  referenceSolutions: {
+    JAVASCRIPT: `// O(n log n) solution
+function lengthOfLIS(nums) {
+  const tails = [];
+  for (const num of nums) {
+    let left = 0, right = tails.length;
+    while(left < right) {
+      const mid = (left + right) >> 1;
+      if(tails[mid] < num) left = mid + 1;
+      else right = mid;
+    }
+    if(left === tails.length) tails.push(num);
+    else tails[left] = num;
+  }
+  return tails.length;
+}`,
+
+    PYTHON: `# O(n log n) solution
+def lengthOfLIS(self, nums: List[int]) -> int:
+    tails = []
+    for num in nums:
+        left = bisect.bisect_left(tails, num)
+        if left == len(tails):
+            tails.append(num)
+        else:
+            tails[left] = num
+    return len(tails)`,
+
+    JAVA: `// O(n log n) solution
+public int lengthOfLIS(int[] nums) {
+    int[] tails = new int[nums.length];
+    int size = 0;
+    for (int x : nums) {
+        int i = Arrays.binarySearch(tails, 0, size, x);
+        if (i < 0) i = -(i + 1);
+        tails[i] = x;
+        if (i == size) size++;
+    }
+    return size;
+}`,
+
+    "C++": `// O(n log n) solution
+int lengthOfLIS(vector<int>& nums) {
+    vector<int> tails;
+    for(int num : nums) {
+        auto it = lower_bound(tails.begin(), tails.end(), num);
+        if(it == tails.end()) tails.push_back(num);
+        else *it = num;
+    }
+    return tails.size();
+}`
+  }
+};
 const CreateProblemForm = () => {
     const [sampleType , setSampleType] = useState("DP")
     const navigation = useNavigate();

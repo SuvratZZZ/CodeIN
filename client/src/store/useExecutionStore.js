@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 export const useExecutionStore = create((set)=>({
     isExecuting:false,
+    isRunning:false,
     submission:null,
 
        executeCode:async ( source_code, language_id, stdin, expected_outputs, problemId)=>{
@@ -29,6 +30,26 @@ export const useExecutionStore = create((set)=>({
         }
         finally{
             set({isExecuting:false});
+        }
+    },
+
+    runCode: async (source_code, language_id, stdin, expected_outputs) => {
+        try {
+            set({ isRunning: true });
+            const res = await axiosInstance.post("/execute-code/run-code", {
+                source_code,
+                language_id,
+                stdin,
+                expected_outputs,
+            });
+
+            set({ submission: res.data.submission });
+            toast.success(res.data.message);
+        } catch (error) {
+            console.log("Error running code", error);
+            toast.error("Error running code");
+        } finally {
+            set({ isRunning: false });
         }
     }
 }))

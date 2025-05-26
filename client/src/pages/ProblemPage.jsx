@@ -42,7 +42,7 @@ const ProblemPage = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [testcases, setTestCases] = useState([]);
   
-  const { executeCode, submission, isExecuting } = useExecutionStore();
+  const { executeCode, submission, isExecuting, isRunning, runCode } = useExecutionStore();
   
   useEffect(() => {
     getProblemById(id);
@@ -76,7 +76,7 @@ const ProblemPage = () => {
     setCode(problem.codeSnippets?.[lang] || "");
   };
 
-  const handleRunCode = (e) => {
+  const handleSubmitCode = (e) => {
     e.preventDefault();
     try {
       const language_id = getLanguageId(selectedLanguage);
@@ -85,6 +85,18 @@ const ProblemPage = () => {
       executeCode(code, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.log("Error executing code", error);
+    }
+  };
+
+  const handleRunCode = (e) => {
+    e.preventDefault();
+    try {
+      const language_id = getLanguageId(selectedLanguage);
+      const stdin = problem.testcases.map((tc) => tc.input);
+      const expected_outputs = problem.testcases.map((tc) => tc.output);  
+      runCode(code, language_id, stdin, expected_outputs, id);
+    } catch (error) {
+      console.log("Error running code", error);
     }
   };
 
@@ -109,11 +121,11 @@ const ProblemPage = () => {
       case "description":
         return (
           <div className="prose max-w-none">
-            <p className="text-lg mb-6">{problem.description}</p>
+            <p className="text-base mb-6">{problem.description}</p>
 
             {problem.examples && (
               <>
-                <h3 className="text-xl font-bold mb-4">Examples:</h3>
+                <h3 className="text-lg font-bold mb-4">Examples:</h3>
                 {Object.entries(problem.examples).map(
                   ([lang, example], idx) => (
                     <div
@@ -141,7 +153,7 @@ const ProblemPage = () => {
                           <div className="text-emerald-300 mb-2 text-base font-semibold">
                             Explanation:
                           </div>
-                          <p className="text-base-content/70 text-lg font-sem">
+                          <p className="text-base-content/70 text-base font-sem">
                             {example.explanation}
                           </p>
                         </div>
@@ -154,9 +166,9 @@ const ProblemPage = () => {
 
             {problem.constraints && (
               <>
-                <h3 className="text-xl font-bold mb-4">Constraints:</h3>
+                <h3 className="text-lg font-bold mb-4">Constraints:</h3>
                 <div className="bg-base-200 p-6 rounded-xl mb-6">
-                  <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
+                  <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-base">
                     {problem.constraints}
                   </span>
                 </div>
@@ -200,7 +212,7 @@ const ProblemPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
+    <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 w-full">
       <nav className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1 gap-2">
           <Link to={"/"} className="flex items-center gap-2 text-primary">
@@ -331,17 +343,17 @@ const ProblemPage = () => {
 
               <div className="p-4 border-t border-base-300 bg-base-200">
                 <div className="flex justify-between items-center">
+                  <button className={`btn btn-success gap-2 ${isRunning ? "loading" : ""}`} onClick={handleRunCode} disabled={isRunning}>
+                    Run Code
+                  </button>
                   <button
                     className={`btn btn-primary gap-2 ${
                       isExecuting ? "loading" : ""
                     }`}
-                    onClick={handleRunCode}
+                    onClick={handleSubmitCode}
                     disabled={isExecuting}
                   >
                     {!isExecuting && <Play className="w-4 h-4" />}
-                    Run Code
-                  </button>
-                  <button className="btn btn-success gap-2">
                     Submit Solution
                   </button>
                 </div>
