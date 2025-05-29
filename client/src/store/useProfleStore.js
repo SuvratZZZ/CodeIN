@@ -6,14 +6,14 @@ import { axiosInstance } from '../lib/axios';
 
 export const useProfileStore = create ((set) => ({
   user: useAuthStore.getState().authUser,
-  solvedProblems: [],
+  profileData: {},
   isLoading: false,
-  getSolvedProblems: async () => {
+  getProfileData: async () => {
     set({ isLoading: true });
     try {
       const response = await axiosInstance.get(`/problems/get-solved-problems-by-user`);
-    //   console.log(response.data.problems);
-      set({ solvedProblems: response.data.problems });
+      // console.log(response.data.data);
+      set({ profileData: response.data.data });
     } catch (error) {
       console.error('Error fetching solved problems:', error);
     } finally {

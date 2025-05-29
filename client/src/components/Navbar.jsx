@@ -1,15 +1,24 @@
 import React from "react"
-import { User, Code, LogOut } from "lucide-react";
+import { User, Code, LogOut, Home, BookOpen, List } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 import CodeInSVG from "./CodeInSVG";
 
+
 const Navbar = ()=>{
+    const {authUser, logout} = useAuthStore()
+    const navigate = useNavigate()
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false)
 
-    const {authUser} = useAuthStore()
+    const handleLogout = async () => {
+        await logout()
+        navigate("/login")
+    }
 
-    console.log("AUTH_USER",authUser)
+    const handleLinkClick = () => {
+        setIsMenuOpen(false)
+    }
 
     return (
      <nav className="sticky top-0 z-50 w-full py-5">
@@ -63,6 +72,9 @@ const Navbar = ()=>{
               </li>
               <li>
                 <Link
+                  onClick={()=>{
+                    setIsMenuOpen(false)
+                  }}
                   to="/profile"
                   className="hover:bg-primary hover:text-white text-base font-semibold"
                 >
@@ -74,6 +86,9 @@ const Navbar = ()=>{
                 <li>
                   <Link
                     to="/add-problem"
+                    onClick={()=>{
+                      setIsMenuOpen(false)
+                    }}
                     className="hover:bg-primary hover:text-white text-base font-semibold"
                   >
                     <Code className="w-4 h-4 mr-1" />
@@ -82,7 +97,11 @@ const Navbar = ()=>{
                 </li>
               )}
               <li>
-                <LogoutButton className="hover:bg-primary hover:text-white">
+                <LogoutButton 
+                onClick={()=>{
+                  setIsMenuOpen(false)
+                }}
+                className="hover:bg-primary hover:text-white">
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
                 </LogoutButton>
@@ -94,6 +113,5 @@ const Navbar = ()=>{
     </nav>
     )
 }
-
 
 export default Navbar;

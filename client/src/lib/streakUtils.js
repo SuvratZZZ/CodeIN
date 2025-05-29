@@ -1,34 +1,35 @@
-export const generateHeatmapData = (solvedDates, weeks = 26) => {
-    const dateCountMap = solvedDates.reduce((acc, date) => {
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    }, {});
+// streakUtils.js
+export const generateHeatmapData = (solvedDates) => {
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 364); // 365 days
+
+  const dateMap = {};
+  solvedDates.forEach((d) => {
+    dateMap[d] = (dateMap[d] || 0) + 1;
+  });
+
+  const data = [];
+  const tempDate = new Date(startDate);
   
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize time
-    
-    const startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - (weeks * 7));
-    
-    const heatmapData = [];
-    let currentDate = new Date(startDate);
-  
-    // Generate all days for 26 weeks
-    for (let week = 0; week < weeks; week++) {
-      const weekDays = [];
-      for (let day = 0; day < 7; day++) {
-        const dateString = currentDate.toISOString().split('T')[0];
-        weekDays.push({
-          date: dateString,
-          count: dateCountMap[dateString] || 0
-        });
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      heatmapData.push(weekDays);
-    }
-  
-    return heatmapData;
-  };
+  for (let i = 0; i < 365; i++) {
+    const dateStr = tempDate.toISOString().split('T')[0];
+    data.push({
+      date: dateStr,
+      count: dateMap[dateStr] || 0,
+    });
+    tempDate.setDate(tempDate.getDate() + 1);
+  }
+
+  // Group into 7-day weeks (columns in GitHub heatmap)
+  const weeks = [];
+  for (let i = 0; i < data.length; i += 7) {
+    weeks.push(data.slice(i, i + 7));
+  }
+
+  return weeks;
+};
+
   
   export const calculateStreak = (solvedDates) => {
     if (solvedDates.length === 0) return 0;

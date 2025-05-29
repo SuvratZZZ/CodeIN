@@ -123,11 +123,122 @@ export const deleteProblem = async (req, res) => {
 };
 
 export const getSolvedProblems = async (req, res) => {
-    const { id } = req.params;
+    try {
+        const solvedProblems = await db.problemSolved.findMany({
+            include: {
+                problem: true
+            }
+        });
 
-    const solvedProblems = await db.Problem.findMany({
-        where: { solved: true }
-    });
+        res.status(200).json({
+            success: true,
+            message: "Solved problems fetched successfully",
+            solvedProblems
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch solved problems",
+            error: error.message
+        });
+    }
+};
 
-    res.status(200).json(solvedProblems);
+export const getSolvedProblemsByUser = async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        // Get all solved problems with their details
+        const solvedProblems = await db.problemSolved.findMany({
+            where: { userId },
+            include: {
+                problem: {
+                    select: {
+                        id: true,
+                        title: true,
+                        difficulty: true,
+                        tags: true,
+                        createdAt: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        // Get difficulty counts
+        const difficultyCounts = {
+            EASY: solvedProblems.filter(p => p.problem.difficulty === "EASY").length,
+            MEDIUM: solvedProblems.filter(p => p.problem.difficulty === "MEDIUM").length,
+            HARD: solvedProblems.filter(p => p.problem.difficulty === "HARD").length
+        };
+
+        // Get submission history for heatmap
+        const submissions = await db.submission.findMany({
+            where: {
+                userId,
+                status: "Accepted"
+            },
+            select: {
+                createdAt: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        // Generate heatmap data
+        const heatmapData = [];
+        const today = new Date();
+        for (let i = 179; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            const count = submissions.filter(s => 
+                s.createdAt.toISOString().split('T')[0] === dateStr
+            ).length;
+            heatmapData.push({
+                date: dateStr,
+                count
+            });
+        }
+
+        // Calculate streak
+        let streak = 0;
+        let currentDate = new Date();
+        while (true) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const hasSubmission = submissions.some(s => 
+                s.createdAt.toISOString().split('T')[0] === dateStr
+            );
+            if (!hasSubmission) break;
+            streak++;
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                solvedProblems,
+                difficultyCounts,
+                heatmapData,
+                totalSolved: solvedProblems.length,
+                streak,
+                stats: {
+                    totalSolved: solvedProblems.length,
+                    easySolved: difficultyCounts.EASY,
+                    mediumSolved: difficultyCounts.MEDIUM,
+                    hardSolved: difficultyCounts.HARD
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching solved problems:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch solved problems",
+            error: error.message
+        });
+    }
 };

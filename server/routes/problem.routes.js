@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMid } from "../middleware/auth.middleware.js";
 import { checkAdmin } from "../middleware/auth.middleware.js";
-import { createProblem, deleteProblem, getAllProblems, getProblemById, getSolvedProblems, updateProblem } from "../controllers/problem.controller.js";
+import { createProblem, deleteProblem, getAllProblems, getProblemById, getSolvedProblems, updateProblem, getSolvedProblemsByUser } from "../controllers/problem.controller.js";
 
 
 const router = Router();
@@ -17,5 +17,7 @@ router.put("/update-problem/:id", authMid, checkAdmin, updateProblem);
 router.delete("/delete-problem/:id", authMid, checkAdmin, deleteProblem);
 
 router.get("/get-solved-problems", authMid, getSolvedProblems);
+
+router.get("/get-solved-problems-by-user", authMid, getSolvedProblemsByUser);
 
 export default router;

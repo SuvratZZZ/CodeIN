@@ -1,24 +1,16 @@
 import React, { useState, useMemo } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
-import { Bookmark, PencilIcon, Trash, TrashIcon, Plus } from "lucide-react";
+import { PencilIcon, TrashIcon } from "lucide-react";
 import { useActions } from "../store/useAction";
-import AddToPlaylistModal from "./AddToPlaylist";
-import CreatePlaylistModal from "./CreatePlaylistModal";
-import { usePlaylistStore } from "../store/usePlaylistStore";
-
 
 const ProblemsTable = ({ problems }) => {
   const { authUser } = useAuthStore();
   const { onDeleteProblem } = useActions();
-  const { createPlaylist } = usePlaylistStore();
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("ALL");
   const [selectedTag, setSelectedTag] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
-  const [selectedProblemId, setSelectedProblemId] = useState(null);
 
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
@@ -59,27 +51,11 @@ const ProblemsTable = ({ problems }) => {
     onDeleteProblem(id);
   };
 
-  const handleCreatePlaylist = async (data) => {
-    await createPlaylist(data);
-  };
-
-  const handleAddToPlaylist = (problemId) => {
-    setSelectedProblemId(problemId);
-    setIsAddToPlaylistModalOpen(true);
-  };
-
   return (
     <div className="w-full max-w-6xl mx-auto mt-10">
-      {/* Header with Create Playlist Button */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
-        <button
-          className="btn btn-primary gap-2"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          <Plus className="w-4 h-4" />
-          Create Playlist
-        </button>
       </div>
 
       {/* Filters */}
@@ -190,13 +166,6 @@ const ProblemsTable = ({ problems }) => {
                             </button>
                           </div>
                         )}
-                        <button
-                          className="btn btn-sm btn-outline flex gap-2 items-center"
-                          onClick={() => handleAddToPlaylist(problem.id)}
-                        >
-                          <Bookmark className="w-4 h-4" />
-                          <span className="hidden sm:inline">Save to Playlist</span>
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -233,19 +202,6 @@ const ProblemsTable = ({ problems }) => {
           Next
         </button>
       </div>
-
-      {/* Modals */}
-      <CreatePlaylistModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreatePlaylist}
-      />
-      
-      <AddToPlaylistModal
-        isOpen={isAddToPlaylistModalOpen}
-        onClose={() => setIsAddToPlaylistModalOpen(false)}
-        problemId={selectedProblemId}
-      />
     </div>
   );
 };

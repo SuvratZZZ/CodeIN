@@ -876,7 +876,7 @@ int main() {
    try {
     setIsLoading(true)
     const res = await axiosInstance.post("/problems/create-problem" , value)
-    console.log(res.data);
+    // console.log(res.data);
     toast.success(res.data.message || "Problem Created successfully⚡");
     navigation("/");
 

@@ -14,6 +14,7 @@ const CodeInSVG = ({ width = 40, height = 40, className = '' }) => {
       <defs>
         <linearGradient id="bgGradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="50%" stopColor="#2563EB" />
           <stop offset="100%" stopColor="#1D4ED8" />
         </linearGradient>
         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -26,7 +27,7 @@ const CodeInSVG = ({ width = 40, height = 40, className = '' }) => {
       <circle cx="20" cy="20" r="19" fill="url(#bgGradient)" />
       
       {/* Inner circle for depth */}
-      <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+      <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
       
       {/* Code brackets with glow */}
       <path
@@ -50,7 +51,7 @@ const CodeInSVG = ({ width = 40, height = 40, className = '' }) => {
       {/* Shine effect */}
       <path
         d="M20 8C20 8 22 12 20 20C18 28 20 32 20 32"
-        stroke="rgba(255,255,255,0.2)"
+        stroke="rgba(255,255,255,0.3)"
         strokeWidth="1"
         strokeLinecap="round"
       />

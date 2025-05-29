@@ -12,7 +12,7 @@ const GoogleLogin = () => {
         <div className="w-full">
             <GoogleLoginComponent
                 onSuccess={(credentialResponse) => {
-                    console.log(credentialResponse);
+                    // console.log(credentialResponse);
                     googleLogin(credentialResponse);
                 }}
                 onError={() => {

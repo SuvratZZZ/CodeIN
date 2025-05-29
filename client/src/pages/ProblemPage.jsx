@@ -23,7 +23,7 @@ import { useExecutionStore } from "../store/useExecutionStore";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import Submission from "../components/Submission";
 import SubmissionsList from "../components/SubmissionList";
-
+import Loader from "../components/Loader";
 const ProblemPage = () => {
   const { id } = useParams();
   const { getProblemById, problem, isProblemLoading } = useProblemStore();
@@ -52,7 +52,7 @@ const ProblemPage = () => {
   useEffect(() => {
     if (problem) {
       setCode(problem.codeSnippets[selectedLanguage.toUpperCase()]);
-      console.log("problem", problem.codeSnippets[selectedLanguage.toUpperCase()]);
+      // console.log("problem", problem.codeSnippets[selectedLanguage.toUpperCase()]);
       setTestCases(
         problem.testcases?.map((tc) => ({
           input: tc.input,
@@ -68,7 +68,7 @@ const ProblemPage = () => {
     }
   }, [activeTab, id]);
 
-  console.log("submission", submissions);
+  // console.log("submission", submissions);
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -107,12 +107,7 @@ const ProblemPage = () => {
 
   if (isProblemLoading || !problem) {
     return (
-      <div className="flex items-center justify-center h-screen bg-base-200">
-        <div className="card bg-base-100 p-8 shadow-xl">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-base-content/70">Loading problem...</p>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
